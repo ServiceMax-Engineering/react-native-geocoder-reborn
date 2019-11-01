@@ -2,6 +2,8 @@
 
 #import <CoreLocation/CoreLocation.h>
 
+#import <Contacts/Contacts.h>
+
 #import <React/RCTConvert.h>
 
 @implementation RCTConvert (CoreLocation)
@@ -14,7 +16,20 @@
     double lng = [RCTConvert double:json[@"lng"]];
     return [[CLLocation alloc] initWithLatitude:lat longitude:lng];
 }
+@end
 
+@implementation RCTConvert (CNMutablePostalAddress)
++ (CNMutablePostalAddress *)CNMutablePostalAddress:(id)json
+{
+    NSDictionary<NSString *, id> *details = [self NSDictionary:json];
+    CNMutablePostalAddress *address = [CNMutablePostalAddress new];
+    address.state = [RCTConvert NSString:details[@"state"] == (id)[NSNull null] ? @"" : details[@"state"]];
+    address.city = [RCTConvert NSString:details[@"city"] == (id)[NSNull null] ? @"" : details[@"city"]];
+    address.postalCode = [RCTConvert NSString:details[@"zip"] == (id)[NSNull null] ? @"" : details[@"zip"]];
+    address.street = [RCTConvert NSString:details[@"street"] == (id)[NSNull null] ? @"" : details[@"street"]];
+    address.country = [RCTConvert NSString:details[@"country"] == (id)[NSNull null] ? @"" : details[@"country"]];
+    return address;
+}
 @end
 
 @implementation RNGeocoder
@@ -52,6 +67,16 @@ RCT_EXPORT_METHOD(geocodePosition:(CLLocation *)location
     } else {
         [self.geocoder reverseGeocodeLocation:location completionHandler:handler];
     }
+}
+
+RCT_EXPORT_METHOD(geocodeAddressObject:(CNMutablePostalAddress *)address
+                  language:(NSString *)language
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSString *addressString = [CNPostalAddressFormatter stringFromPostalAddress:address
+                               style:CNPostalAddressFormatterStyleMailingAddress];
+    [self geocodeAddress:addressString language:language resolver:resolve rejecter:reject];
 }
 
 RCT_EXPORT_METHOD(geocodeAddress:(NSString *)address
