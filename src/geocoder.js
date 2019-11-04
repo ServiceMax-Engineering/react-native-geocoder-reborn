@@ -3,7 +3,7 @@ import GoogleApi from './googleApi.js';
 
 const { RNGeocoder } = NativeModules;
 
-function addressToString(address) {
+const addressToString = address => {
   let addressStr = ['street', 'city', 'state']
     .filter(f => address[f])
     .map(f => address[f])
@@ -14,7 +14,7 @@ function addressToString(address) {
     addressStr += address.country ? `, ${address.country}` : '';
   }
   return addressStr;
-}
+};
 
 export default {
 
@@ -67,7 +67,7 @@ export default {
   },
 
   geocodeAddressObject(addressObj) {
-    if (!addressObj) {
+    if (!addressObj || Object.entries(addressObj).length === 0) {
       return Promise.reject(new Error("Address is required"));
     }
 
