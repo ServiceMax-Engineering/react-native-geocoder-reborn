@@ -55,6 +55,30 @@ public class RNGeocoderModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void geocodeAddressObject(ReadableMap addressMap, String language, Promise promise) {
+        if (addressMap == null || addressMap.toHashMap().isEmpty()) {
+            promise.reject("NOT_AVAILABLE", "Address cannot be empty.");
+        }
+        StringBuilder addressName = new StringBuilder();
+        if (!addressMap.isNull("street")) {
+            addressName.append(addressMap.getString("street"));
+        }
+        if (!addressMap.isNull("city")) {
+            addressName.append(", ").append(addressMap.getString("city"));
+        }
+        if (!addressMap.isNull("state")) {
+            addressName.append(", ").append(addressMap.getString("state"));
+        }
+        if (!addressMap.isNull("zip")) {
+            addressName.append(" ").append(addressMap.getString("zip"));
+        }
+        if (!addressMap.isNull("country")) {
+            addressName.append(", ").append(addressMap.getString("country"));
+        }
+        geocodeAddress(addressName.toString(), language, promise);
+    }
+
+    @ReactMethod
     public void geocodePosition(ReadableMap position, String language, Promise promise) {
         if (geocoder == null) {
             geocoder = new Geocoder(getReactApplicationContext(), new Locale(language));

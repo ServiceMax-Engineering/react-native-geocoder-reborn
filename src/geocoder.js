@@ -3,6 +3,19 @@ import GoogleApi from './googleApi.js';
 
 const { RNGeocoder } = NativeModules;
 
+const addressToString = address => {
+  let addressStr = ['street', 'city', 'state']
+    .filter(f => address[f])
+    .map(f => address[f])
+    .join(', ');
+
+  if (addressStr) {
+    addressStr += address.zip ? ` ${address.zip}, ` : ', ';
+    addressStr += address.country ? `, ${address.country}` : '';
+  }
+  return addressStr;
+};
+
 export default {
 
   apiKey: '',
@@ -52,4 +65,20 @@ export default {
       return GoogleApi.geocodeAddress(this.apiKey, address, this.language);
     });
   },
+
+  geocodeAddressObject(addressObj) {
+    if (!addressObj || Object.entries(addressObj).length === 0) {
+      return Promise.reject(new Error("Address is required"));
+    }
+
+    if (this.useGoogleOnIos && this.apiKey && Platform.OS === 'ios') {
+      return GoogleApi.geocodeAddress(this.apiKey, addressToString(addressObj), this.language);
+    }
+
+    return RNGeocoder.geocodeAddressObject(addressObj, this.language).catch(err => {
+      if (!this.apiKey) { throw err; }
+      return GoogleApi.geocodeAddress(this.apiKey, addressToString(addressObj), this.language);
+    });
+  },
+
 }
