@@ -60,19 +60,19 @@ public class RNGeocoderModule extends ReactContextBaseJavaModule {
             promise.reject("NOT_AVAILABLE", "Address cannot be empty.");
         }
         StringBuilder addressName = new StringBuilder();
-        if (!addressMap.isNull("street")) {
+        if (addressMap.hasKey("street") && !addressMap.isNull("street")) {
             addressName.append(addressMap.getString("street"));
         }
-        if (!addressMap.isNull("city")) {
+        if (addressMap.hasKey("city") && !addressMap.isNull("city")) {
             addressName.append(", ").append(addressMap.getString("city"));
         }
-        if (!addressMap.isNull("state")) {
+        if (addressMap.hasKey("state") && !addressMap.isNull("state")) {
             addressName.append(", ").append(addressMap.getString("state"));
         }
-        if (!addressMap.isNull("zip")) {
+        if (addressMap.hasKey("zip") && !addressMap.isNull("zip")) {
             addressName.append(" ").append(addressMap.getString("zip"));
         }
-        if (!addressMap.isNull("country")) {
+        if (addressMap.hasKey("country") && !addressMap.isNull("country")) {
             addressName.append(", ").append(addressMap.getString("country"));
         }
         geocodeAddress(addressName.toString(), language, promise);
